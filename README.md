@@ -1,4 +1,8 @@
-# 🎵 TabTape
+
+
+<p align="center">
+  <img src="tabtapecover.png" alt="TabTape - www.ilbak.it - is a minimal, local-first web app for playing audio files directly from a folder on your computer — no uploads, no server, no dependencies. Just open the HTML file in your browser, pick a folder, and listen. In a a single self-contained HTML file." width="80%">
+</p>
 
 **TabTape** is a minimal, local-first web app for playing audio files directly from a folder on your computer — no uploads, no server, no dependencies. Just open the HTML file in your browser, pick a folder, and listen. In a a single self-contained HTML file.
 
