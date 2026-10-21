@@ -3,235 +3,617 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎵 TabTape</title>
-<!--
-- www.ilbak.it
-- github.com/ilbak
--->
+<title>TabTape</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
 <style>
   :root {
-    --bg: #0f1115; --panel: #171a21; --panel-2: #1f232c;
-    --border: #2a2f3a; --text: #e6e9ef; --muted: #8b93a7;
-    --accent: #4f8cff; --accent-2: #6ee7b7; --danger: #ef4444;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; padding: 0; background: var(--bg); color: var(--text);
-    font-family: system-ui, -apple-system, sans-serif; min-height: 100vh;
-  }
-  .app { max-width: 720px; margin: 0 auto; padding: 32px 20px 60px; }
-  .card {
-    background: var(--panel); border: 1px solid var(--border);
-    border-radius: 14px; padding: 18px; margin-bottom: 18px;
-  }
-  .path-row { display: flex; gap: 10px; flex-wrap: wrap; }
-  #pathform {
-    flex: 1; min-width: 160px; background: var(--panel-2); border: 1px solid var(--border);
-    color: var(--text); padding: 11px 14px; border-radius: 10px;
-    font-size: 0.9rem; outline: none;
-  }
-  #pathform:read-only { opacity: 0.75; cursor: default; }
-  .btn {
-    background: var(--accent); color: #fff; border: none;
-    padding: 11px 18px; border-radius: 10px; font-weight: 600;
-    cursor: pointer; white-space: nowrap; transition: filter 0.15s, transform 0.05s;
-  }
-  .btn:hover { filter: brightness(1.1); }
-  .btn:active { transform: scale(0.98); }
-  .btn.secondary {
-    background: var(--panel-2); border: 1px solid var(--border); color: var(--text);
-  }
-  .btn.secondary:hover { background: #262b36; border-color: var(--accent); color: var(--accent); filter: none; }
-
-  #hint {
-    font-size: 0.8rem; color: var(--muted);
-    margin-bottom: 12px; line-height: 1.4;
-    min-height: 1.2em;
+    --plastic: #1a1c21;
+    --plastic-light: #2a2d35;
+    --label-bg: #f0e6d2;
+    --label-text: #2b2b2b;
+    --orange: #e87a36;
+    --orange-dark: #c55e22;
+    --text-main: #e6e9ef;
+    --text-muted: #8b93a7;
+    --font-hand: 'Courier New', 'Courier', monospace;
+    --font-ui: system-ui, -apple-system, sans-serif;
   }
 
-  .playlist-toolbar {
-    display: flex; gap: 10px; flex-wrap: wrap;
-    margin-bottom: 12px; align-items: center;
-  }
-  #searchInput {
-    flex: 1; min-width: 120px;
-    background: var(--panel-2); border: 1px solid var(--border);
-    color: var(--text); padding: 9px 12px; border-radius: 10px;
-    font-size: 0.85rem; outline: none;
-  }
-  #searchInput:focus { border-color: var(--accent); }
-  #searchClearBtn {
-    background: var(--panel-2); border: 1px solid var(--border);
-    color: var(--muted); padding: 9px 12px; border-radius: 10px;
-    font-size: 0.85rem; cursor: pointer;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
-  }
-  #searchClearBtn:hover {
-    background: rgba(239, 68, 68, 0.1);
-    border-color: var(--danger);
-    color: var(--danger);
-  }
-  #searchClearBtn:disabled {
-    opacity: 0.35; cursor: not-allowed;
-    background: var(--panel-2); border-color: var(--border); color: var(--muted);
-  }
-  #sortSelect {
-    background: var(--panel-2); border: 1px solid var(--border);
-    color: var(--text); padding: 9px 12px; border-radius: 10px;
-    font-size: 0.85rem; outline: none; cursor: pointer;
-  }
-  #sortSelect:focus { border-color: var(--accent); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  .playlist { list-style: none; margin: 0; padding: 0; max-height: 320px; overflow-y: auto; }
-  .playlist li {
-    display: flex; align-items: center; gap: 10px;
-    padding: 11px 14px; border-radius: 10px; cursor: pointer;
+  body, html {
+    height: 100%;
+    background: #111316;
+    background-image: radial-gradient(circle at 50% 0%, #2a2d35 0%, #111316 70%);
+    font-family: var(--font-ui);
+    color: var(--text-main);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* --- CASSETTE SHELL --- */
+  .cassette-shell {
+    position: relative;
+    width: 100%;
+    max-width: 720px;
+    height: 100dvh;
+    max-height: 800px;
+    background: var(--plastic);
+    border-radius: 16px;
+    box-shadow: 
+      inset 0 2px 4px rgba(255,255,255,0.1),
+      inset 0 -4px 10px rgba(0,0,0,0.8),
+      0 20px 40px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 22px;
+    background-image: 
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 3px),
+      linear-gradient(to bottom, #2a2d35, #15171a);
+    border: 2px solid #0d0e10;
+  }
+
+  /* Screws */
+  .screw {
+    position: absolute;
+    width: 12px; height: 12px;
+    background: #111; border-radius: 50%;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.05);
+    border: 1px solid #000;
+  }
+  .screw::after {
+    content: ""; position: absolute; top: 50%; left: 2px; right: 2px;
+    height: 1px; background: #333; transform: translateY(-50%) rotate(45deg);
+  }
+  .screw.tl { top: 12px; left: 12px; }
+  .screw.tr { top: 12px; right: 12px; }
+  .screw.bl { bottom: 12px; left: 12px; }
+  .screw.br { bottom: 12px; right: 12px; }
+
+  /* --- LABEL (The paper part) --- */
+  .label {
+    background: var(--label-bg);
+    border-radius: 4px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    color: var(--label-text);
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+    border: 1px solid #d0c5ae;
+  }
+
+  /* Orange Stripe (acts as hint) */
+  .stripe {
+    height: 32px;
+    background: var(--orange);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    font-family: var(--font-hand);
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+    border-bottom: 1px solid var(--orange-dark);
     font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .playlist li:hover { background: var(--panel-2); }
-  .playlist li.active { background: rgba(79,140,255,0.12); color: var(--accent); font-weight: 600; }
-  .playlist li .idx { color: var(--muted); font-size: 0.75rem; min-width: 22px; font-variant-numeric: tabular-nums; }
-  .playlist li .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .playlist .empty { color: var(--muted); font-style: italic; cursor: default; justify-content: center; }
 
-  .comandi { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  /* --- CONTENT AREA (Toolbar, Playlist, Controls) --- */
+  .content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 16px 16px;
+    min-height: 0;
+  }
+
+  /* Top Toolbar (Path, Load, Search, Sort) */
+  .toolbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    align-items: center;
+  }
+  
+  .toolbar input, .toolbar select, .toolbar button {
+    background: #e2d7c2;
+    border: 1px solid #b8ab93;
+    color: #222;
+    padding: 8px 10px;
+    border-radius: 3px;
+    font-size: 0.85rem;
+    font-family: var(--font-hand);
+    outline: none;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    min-height: 36px;
+  }
+  .toolbar input:focus, .toolbar select:focus { border-color: #999; }
+  
+  .toolbar input { flex: 1; min-width: 80px; }
+  
+  .toolbar button {
+    cursor: pointer;
+    background: #d8ccb5;
+    transition: background 0.1s;
+    white-space: nowrap;
+  }
+  .toolbar button:hover { background: #cbbfa8; }
+  .toolbar button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* The List */
+  .playlist-container {
+    flex: 1;
+    background: #fffdf5;
+    border: 1px solid #d0c5ae;
+    border-radius: 3px;
+    overflow-y: auto;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+    margin-bottom: 12px;
+    position: relative;
+  }
+
+  .playlist-container::-webkit-scrollbar { width: 6px; }
+  .playlist-container::-webkit-scrollbar-track { background: #f0e6d2; }
+  .playlist-container::-webkit-scrollbar-thumb { background: #cbbfa8; border-radius: 3px; }
+
+  .playlist {
+    list-style: none;
+    padding: 4px 0;
+  }
+  .playlist li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 12px;
+    font-family: var(--font-hand);
+    font-size: 0.9rem;
+    color: #333;
+    cursor: pointer;
+    border-bottom: 1px dashed #e0d6c3;
+  }
+  .playlist li:last-child { border-bottom: none; }
+  .playlist li:hover { background: #f5ebe0; }
+  
+  .playlist li.active { 
+    background: #e8dfc8; 
+    font-weight: bold; 
+    color: #000;
+  }
+  .playlist li.active::before {
+    content: "▶"; font-size: 0.7rem; color: var(--orange-dark); position: absolute; left: 4px;
+  }
+  
+  .playlist li.played .name { opacity: 0.4; text-decoration: line-through; }
+  
+  .playlist li .idx { color: #999; font-size: 0.75rem; min-width: 20px; }
+  .playlist li .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+  
+  .playlist .empty {
+    justify-content: center; color: #999; font-style: italic; cursor: default;
+    padding: 20px; border: none;
+  }
+
+  /* --- CONTROLS AREA (Bigger) --- */
+  .controls-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: auto;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #e2d7c2;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #b8ab93;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .now-playing {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--font-hand);
+    color: #555;
+    text-align: left;
+    line-height: 1.3;
+  }
+  .now-playing .title {
+    display: block;
+    font-weight: bold;
+    font-size: 1rem;
+    color: #111;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .now-playing #nowState {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  /* Play/Pause bigger */
   .ctrl-btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 52px; height: 52px; border-radius: 50%;
-    border: 1px solid var(--border); background: var(--panel-2);
-    color: var(--text); cursor: pointer;
+    width: 48px; height: 48px;
+    background: linear-gradient(to bottom, #444, #222);
+    border: 1px solid #000;
+    border-radius: 6px;
+    color: #ddd;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 3px 0 #000, inset 0 1px 0 rgba(255,255,255,0.2);
+    transition: all 0.05s;
+    flex-shrink: 0;
   }
-  .ctrl-btn.play { background: var(--accent); border-color: var(--accent); color: #fff; width: 60px; height: 60px; }
-  .ctrl-btn svg { width: 22px; height: 22px; fill: currentColor; }
-  .ctrl-btn.play svg { width: 26px; height: 26px; }
-  .now-playing { flex: 1; text-align: right; font-size: 0.85rem; color: var(--muted); }
-  .now-playing .title { color: var(--text); font-weight: 600; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ctrl-btn:active { 
+    transform: translateY(3px); 
+    box-shadow: 0 0 0 #000, inset 0 1px 0 rgba(255,255,255,0.2); 
+  }
+  .ctrl-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: 0 3px 0 #000; }
+  
+  .ctrl-btn.play {
+    width: 64px; height: 64px;
+    background: linear-gradient(to bottom, #c55e22, #8a3b0e);
+    color: white; border-color: #5a2405;
+    border-radius: 50%;
+  }
+  
+  .ctrl-btn svg { width: 20px; height: 20px; fill: currentColor; }
+  .ctrl-btn.play svg { width: 28px; height: 28px; }
 
-  .progress-row {
-    display: flex; align-items: center; gap: 10px;
-    margin-top: 16px;
+  /* --- SLIDERS AREA (Bigger) --- */
+  .sliders {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #e2d7c2;
+    padding: 14px 16px;
+    border-radius: 6px;
+    border: 1px solid #b8ab93;
   }
-  .progress-row .time {
-    font-size: 0.75rem; color: var(--muted); min-width: 44px;
-    font-variant-numeric: tabular-nums;
-  }
-  .progress-row .time.right { text-align: right; }
-  #progress {
-    flex: 1; -webkit-appearance: none; appearance: none;
-    height: 4px; background: var(--border); border-radius: 4px;
-    outline: none; cursor: pointer;
-  }
-  #progress:disabled { opacity: 0.4; cursor: not-allowed; }
-  #progress::-webkit-slider-thumb {
-    -webkit-appearance: none; appearance: none;
-    width: 14px; height: 14px; border-radius: 50%;
-    background: var(--accent); cursor: pointer;
-    transition: transform 0.1s;
-  }
-  #progress::-webkit-slider-thumb:hover { transform: scale(1.2); }
-  #progress::-moz-range-thumb {
-    width: 14px; height: 14px; border-radius: 50%;
-    background: var(--accent); border: none; cursor: pointer;
-  }
-  #progress::-moz-range-track { height: 4px; background: var(--border); border-radius: 4px; }
 
-  .random-row { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.9rem; }
-  .switch { position: relative; width: 44px; height: 24px; }
-  .switch input { opacity: 0; width: 0; height: 0; }
-  .slider { position: absolute; inset: 0; background: var(--border); border-radius: 24px; transition: background 0.2s; }
-  .slider::before {
-    content: ""; position: absolute; height: 18px; width: 18px;
-    left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s;
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-hand);
+    font-size: 0.9rem;
+    color: #555;
   }
-  .switch input:checked + .slider { background: var(--accent-2); }
-  .switch input:checked + .slider::before { transform: translateX(20px); }
+  .slider-row .time { min-width: 44px; text-align: center; font-weight: bold; color: #333; }
+  
+  input[type=range] {
+    -webkit-appearance: none;
+    flex: 1;
+    height: 8px; /* Bigger track */
+    background: #d0c5ae;
+    border-radius: 4px;
+    outline: none;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px; height: 24px; /* Bigger thumb for touch */
+    border-radius: 50%;
+    background: #333;
+    border: 2px solid #111;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  input[type=range]:disabled { opacity: 0.5; cursor: not-allowed; }
+  input[type=range]:disabled::-webkit-slider-thumb { cursor: not-allowed; }
 
-  /* ---------- Footer ---------- */
+  /* Volume icon button */
+  .vol-icon {
+    background: none; border: none; color: #555; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0; width: 28px;
+  }
+  .vol-icon:hover { color: #111; }
+  .vol-icon svg { width: 24px; height: 24px; fill: currentColor; }
+
+  /* Hidden toggles */
+  .hidden-check {
+    position: absolute; opacity: 0; pointer-events: none;
+  }
+  .switch-label {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-hand); font-size: 0.85rem; color: #333;
+    cursor: pointer; user-select: none; font-weight: bold;
+  }
+  .switch-ui {
+    width: 40px; height: 22px; background: #d0c5ae; border-radius: 12px;
+    position: relative; transition: background 0.2s; border: 1px solid #b8ab93;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .switch-ui::after {
+    content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+    background: #333; border-radius: 50%; transition: transform 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
+  .hidden-check:checked + .switch-ui { background: #e87a36; border-color: #c55e22; }
+  .hidden-check:checked + .switch-ui::after { transform: translateX(18px); background: #fff; }
+
+  /* --- BOTTOM PLASTIC AREA --- */
+  .bottom-plastic {
+    height: 50px;
+    background: linear-gradient(to bottom, #222, #111);
+    border-top: 2px solid #333;
+    border-radius: 0 0 12px 12px;
+    margin: 0 -22px -20px -22px; 
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 40px;
+  }
+
+  .trapezoid {
+    width: 60%;
+    height: 24px;
+    background: #1a1c21;
+    clip-path: polygon(10% 0, 90% 0, 100% 100%, 0% 100%);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 20px;
+  }
+  
+  .hole {
+    width: 10px; height: 10px;
+    background: #000; border-radius: 50%;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+  }
+
+  /* Footer embedded */
   .footer {
+    position: absolute;
+    bottom: 4px;
+    width: 100%;
     text-align: center;
-    margin-top: 28px;
-    font-size: 0.75rem;
-    color: var(--muted);
+    font-family: var(--font-hand);
+    font-size: 0.65rem;
+    color: #555;
+    letter-spacing: 1px;
   }
-  .footer a {
-    color: var(--muted);
-    text-decoration: none;
-    transition: color 0.15s;
+  .footer a { color: #777; text-decoration: none; }
+  .footer a:hover { color: var(--orange); }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;
   }
-  .footer a:hover { color: var(--accent); }
+
+  /* --- MOBILE LAYOUT --- */
+  @media (max-width: 600px) {
+    .cassette-shell { 
+      border-radius: 0; border: none; padding: 12px 12px; max-height: 100dvh; 
+    }
+    .bottom-plastic { margin: 0 -12px -12px -12px; height: 40px; border-radius: 0; }
+    
+    .content-area { padding: 8px 8px 12px; }
+    
+    .toolbar { flex-wrap: wrap; gap: 6px; }
+    .toolbar input { flex: 1 1 100%; }
+    .toolbar button { flex: 1; justify-content: center; }
+    
+    .controls {
+      flex-direction: column;
+      padding: 16px 12px;
+      gap: 12px;
+    }
+    
+    .now-playing {
+      text-align: center;
+      width: 100%;
+    }
+    .now-playing .title { font-size: 1.1rem; }
+    
+    .btn-group {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .ctrl-btn { width: 56px; height: 56px; }
+    .ctrl-btn.play { width: 72px; height: 72px; }
+    .ctrl-btn svg { width: 24px; height: 24px; }
+    .ctrl-btn.play svg { width: 32px; height: 32px; }
+
+    .sliders { padding: 16px 12px; }
+    .slider-row { gap: 8px; }
+  }
 </style>
 </head>
 <body>
-  <div class="app">
-    <div class="card">
-      <div class="path-row">
-        <input type="text" id="pathform" placeholder="No folder selected" readonly>
-        <button class="btn secondary" id="refreshBtn" title="Reload the current folder">Refresh</button>
-        <button class="btn" id="loadBtn">Choose folder</button>
-      </div>
+
+<main class="cassette-shell">
+  <!-- Screws -->
+  <div class="screw tl"></div>
+  <div class="screw tr"></div>
+  <div class="screw bl"></div>
+  <div class="screw br"></div>
+
+  <!-- LABEL -->
+  <div class="label">
+    
+    <!-- Stripe acts as hint -->
+    <div class="stripe" id="hint">
+      No folder selected
     </div>
 
-    <div class="card">
-      <div id="hint">
-        The browser requires you to explicitly select a folder. The path will appear here after selection.
+    <!-- Content Area -->
+    <div class="content-area">
+      
+      <input type="file" id="folderInput" webkitdirectory directory multiple class="sr-only">
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <input type="text" id="pathform" placeholder="No folder selected" readonly>
+        <button id="refreshBtn" title="Reload folder">↻</button>
+        <button id="loadBtn" class="btn-primary">Load</button>
       </div>
-      <div class="playlist-toolbar">
-        <input type="text" id="searchInput" placeholder="🔍 Search in playlist...">
-        <button id="searchClearBtn" title="Clear search" disabled>Clear</button>
+      
+      <div class="toolbar" style="margin-bottom: 8px;">
+        <input type="text" id="searchInput" placeholder="🔍 Search...">
+        <button id="searchClearBtn" disabled>Clear</button>
         <select id="sortSelect">
-          <option value="alpha">Name (A–Z)</option>
-          <option value="alpha-desc">Name (Z–A)</option>
-          <option value="none">Original order</option>
+          <option value="alpha">A-Z</option>
+          <option value="alpha-desc">Z-A</option>
+          <option value="none">Order</option>
         </select>
       </div>
-      <ul class="playlist" id="playlist"><li class="empty">No tracks loaded</li></ul>
-    </div>
 
-    <div class="card">
-      <div class="comandi">
-        <button class="ctrl-btn play" id="playBtn" title="Play/Pause">
-          <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        </button>
-        <button class="ctrl-btn" id="nextBtn" title="Next">
-          <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-        </button>
-        <button class="ctrl-btn" id="clearBtn" title="Stop and clear playlist" disabled>
-          <svg viewBox="0 0 24 24"><path d="M6 7h12l-1 13H7L6 7zm3-3h6l1 2H8l1-2z"/></svg>
-        </button>
-        <div class="now-playing">
-          <span class="title" id="nowTitle">—</span>
-          <span id="nowState">waiting</span>
+      <!-- Playlist -->
+      <div class="playlist-container">
+        <ul class="playlist" id="playlist">
+          <li class="empty">No tracks loaded</li>
+        </ul>
+      </div>
+
+      <!-- Controls & Sliders Wrapper -->
+      <div class="controls-wrapper">
+        <!-- Controls (Now Playing + Buttons) -->
+        <div class="controls">
+          <div class="now-playing">
+            <span class="title" id="nowTitle">—</span>
+            <span id="nowState">waiting</span>
+          </div>
+          <div class="btn-group">
+            <button class="ctrl-btn" id="prevBtn" title="Previous" disabled>
+              <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+            </button>
+            <button class="ctrl-btn play" id="playBtn" title="Play/Pause">
+              <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button class="ctrl-btn" id="nextBtn" title="Next">
+              <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+            </button>
+            <button class="ctrl-btn" id="clearBtn" title="Clear" disabled>
+              <svg viewBox="0 0 24 24"><path d="M6 7h12l-1 13H7L6 7zm3-3h6l1 2H8l1-2z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sliders (Progress & Volume) -->
+        <div class="sliders">
+          <div class="slider-row">
+            <span class="time" id="curTime">0:00</span>
+            <input type="range" id="progress" min="0" max="1000" value="0" step="1" disabled>
+            <span class="time right" id="durTime">0:00</span>
+          </div>
+          <div class="slider-row">
+            <button class="vol-icon" id="muteBtn" title="Mute">
+              <svg id="volIcon" viewBox="0 0 24 24"></svg>
+            </button>
+            <input type="range" id="volume" min="0" max="1" value="1" step="0.01">
+            
+            <label class="switch-label" title="Shuffle playback">
+              <input type="checkbox" id="randomcheck" class="hidden-check" checked>
+              <span class="switch-ui"></span>
+              <span>SHFL</span>
+            </label>
+          </div>
         </div>
       </div>
 
-      <div class="progress-row">
-        <span class="time" id="curTime">0:00</span>
-        <input type="range" id="progress" min="0" max="1000" value="0" step="1" disabled>
-        <span class="time right" id="durTime">0:00</span>
-      </div>
-    </div>
+    </div> <!-- End content-area -->
+  </div> <!-- End label -->
 
-    <div class="card">
-      <label class="random-row">
-        <span class="switch">
-          <input type="checkbox" id="randomcheck" checked>
-          <span class="slider"></span>
-        </span>
-        <span>Shuffle playback</span>
-      </label>
-    </div>
-
-    <div class="footer">
-      Made by <a href="https://www.ilbak.it/" target="_blank" rel="noopener noreferrer">BaK</a>
+  <!-- Bottom Plastic Area -->
+  <div class="bottom-plastic">
+    <div class="trapezoid">
+      <div class="hole"></div>
+      <div class="hole"></div>
+      <div class="hole"></div>
+      <div class="hole"></div>
+      <div class="hole"></div>
     </div>
   </div>
 
-  <audio id="audio" preload="metadata"></audio>
+  <div class="footer">
+    Made by <a href="https://www.ilbak.it/" target="_blank" rel="noopener noreferrer">BaK</a>
+  </div>
+</main>
+
+<audio id="audio" preload="metadata"></audio>
 
 <script>
 (function () {
   "use strict";
-  const AUDIO_EXTS = [".mp3", ".m4a", ".opus"];
+
+  // ============================================================
+  // AUTO-UPDATE FROM GITHUB
+  // ============================================================
+  const UPDATE_URL = "https://raw.githubusercontent.com/ilbak/tabtape/refs/heads/main/TabTape.html";
+  const LS_UPDATE_KEY = "tabtape.pendingUpdate";
+
+  // 1. Applica aggiornamento pendente PRIMA di tutto il resto.
+  //    Usa un Blob URL e reindirizza il browser. Questo crea un documento pulito
+  //    e non duplica il DOM come farebbe document.write.
+  const pending = localStorage.getItem(LS_UPDATE_KEY);
+  if (pending && pending.trim().length > 0) {
+    try { localStorage.removeItem(LS_UPDATE_KEY); } catch {}
+    const blob = new Blob([pending], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    window.location.replace(url);
+    // Interrompe l'esecuzione dello script corrente
+    throw new Error("REDIRECTING_TO_UPDATE");
+  }
+
+  // 2. Controllo asincrono
+  async function checkForUpdates() {
+    // Previene esecuzioni multiple contemporanee (es. click ripetuti su Refresh)
+    if (window.__tabtape_updating) return;
+    
+    let current = "";
+    try { current = document.documentElement.outerHTML; } catch { return; }
+
+    let remote = "";
+    try {
+      const res = await fetch(UPDATE_URL, { cache: "no-store" });
+      if (!res.ok) return;
+      remote = await res.text();
+    } catch {
+      return; // Silenzioso per offline, CORS, file://
+    }
+
+    if (!remote || remote.trim().length === 0) return;
+
+    const norm = s => s.replace(/\r\n/g, "\n").trim();
+    const a = norm(remote);
+    const b = norm(current);
+
+    if (a === b) return;
+
+    // Sincronizza il testo in localStorage. Alla prossima ricarica verrà
+    // applicato tramite Blob URL dall'inizio dello script.
+    try { 
+      localStorage.setItem(LS_UPDATE_KEY, remote);
+      window.__tabtape_updating = true;
+      window.location.reload();
+    } catch { return; }
+  }
+
+  // ============================================================
+  // APP TABTAPE 2.8
+  // ============================================================
+
+  const AUDIO_EXTS = [".mp3", ".m4a", ".opus", ".ogg", ".oga", ".wav"];
 
   const LS_KEY      = "musicPlayer.settings.v1";
   const IDB_NAME    = "musicPlayerDB";
@@ -248,6 +630,7 @@
   const sortSelect    = document.getElementById("sortSelect");
   const playBtn       = document.getElementById("playBtn");
   const playIcon      = document.getElementById("playIcon");
+  const prevBtn       = document.getElementById("prevBtn");
   const nextBtn       = document.getElementById("nextBtn");
   const clearBtn      = document.getElementById("clearBtn");
   const nowTitle      = document.getElementById("nowTitle");
@@ -257,6 +640,9 @@
   const progress      = document.getElementById("progress");
   const curTime       = document.getElementById("curTime");
   const durTime       = document.getElementById("durTime");
+  const volume        = document.getElementById("volume");
+  const volIcon       = document.getElementById("volIcon");
+  const muteBtn       = document.getElementById("muteBtn");
 
   let tracks = [];
   let viewTracks = [];
@@ -265,6 +651,9 @@
   let currentName = "";
   let dragging = false;
   let folderName = "";
+  let lastVolume = 1;
+  let history = [];
+  let historyCursor = -1;
 
   // ---------- Utilities ----------
   const isAudio = name => AUDIO_EXTS.some(ext => name.toLowerCase().endsWith(ext));
@@ -280,9 +669,31 @@
   const ICON_PAUSE = '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
   const setIcon = playing => playIcon.innerHTML = playing ? ICON_PAUSE : ICON_PLAY;
 
+  const VOL_HIGH = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4.03v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/>';
+  const VOL_LOW  = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4.03v8.05A4.5 4.5 0 0 0 16.5 12z"/>';
+  const VOL_MUTE = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.59 3 2.7-2.7-1.41-1.41-2.7 2.7-2.7-2.7-1.41 1.41 2.7 2.7-2.7 2.7 1.41 1.41 2.7-2.7 2.7 2.7 1.41-1.41-2.7-2.7z"/>';
+
+  function updateVolumeUI() {
+    const v = Number(volume.value);
+    const muted = v === 0;
+    const effective = muted ? lastVolume : v;
+    let icon;
+    if (muted) icon = VOL_MUTE;
+    else if (effective < 0.5) icon = VOL_LOW;
+    else icon = VOL_HIGH;
+    volIcon.innerHTML = icon;
+  }
+
+  function applyVolume() {
+    audio.volume = Number(volume.value);
+    updateVolumeUI();
+    saveSettings();
+  }
+
   function updateClearBtn() {
     clearBtn.disabled = tracks.length === 0;
     searchClearBtn.disabled = searchInput.value.length === 0;
+    prevBtn.disabled = historyCursor <= 0;
   }
 
   function updateHint(extra) {
@@ -300,8 +711,7 @@
     } else if (folderName) {
       hint.textContent = folderName + (extra ? " · " + extra : "");
     } else {
-      hint.textContent = extra ||
-        "The browser requires you to explicitly select a folder. The path will appear here after selection.";
+      hint.textContent = extra || "No folder selected";
     }
   }
 
@@ -349,6 +759,65 @@
     updateTimeUI(audio.currentTime, audio.duration);
   });
 
+  // ---------- Volume ----------
+  volume.addEventListener("input", () => {
+    const v = Number(volume.value);
+    if (v > 0) lastVolume = v;
+    applyVolume();
+  });
+
+  muteBtn.addEventListener("click", () => {
+    if (Number(volume.value) > 0) {
+      lastVolume = Number(volume.value);
+      volume.value = "0";
+    } else {
+      volume.value = String(lastVolume || 1);
+    }
+    applyVolume();
+  });
+
+  // ---------- History helpers ----------
+  function playedSet() {
+    return new Set(history);
+  }
+
+  function allPlayed() {
+    if (viewTracks.length === 0) return false;
+    const played = playedSet();
+    for (const t of viewTracks) {
+      if (!played.has(t.name)) return false;
+    }
+    return true;
+  }
+
+  function resetHistory() {
+    history = [];
+    historyCursor = -1;
+    [...playlistEl.children].forEach(li => li.classList.remove("played"));
+    updateClearBtn();
+  }
+
+  function pushHistory(name) {
+    if (historyCursor < history.length - 1) {
+      history = history.slice(0, historyCursor + 1);
+    }
+    history.push(name);
+    historyCursor = history.length - 1;
+    refreshPlayedClasses();
+    updateClearBtn();
+  }
+
+  function refreshPlayedClasses() {
+    const played = playedSet();
+    [...playlistEl.children].forEach(li => {
+      if (!li.dataset.index) return;
+      const idx = Number(li.dataset.index);
+      const t = viewTracks[idx];
+      if (t && played.has(t.name)) li.classList.add("played");
+      else li.classList.remove("played");
+    });
+  }
+
   // ---------- Sorting ----------
   function getSortedList() {
     const mode = sortSelect.value;
@@ -379,6 +848,7 @@
 
     renderPlaylist();
     updateActive();
+    refreshPlayedClasses();
     updateClearBtn();
     updateHint();
   }
@@ -400,7 +870,7 @@
       if (i === currentIndex) li.classList.add("active");
       li.innerHTML = `<span class="idx">${String(i+1).padStart(2,"0")}</span><span class="name"></span>`;
       li.querySelector(".name").textContent = t.name;
-      li.addEventListener("click", () => playTrack(i));
+      li.addEventListener("click", () => userClickTrack(i));
       playlistEl.appendChild(li);
     });
   }
@@ -425,7 +895,8 @@
       pathName:    pathform.value || "",
       currentName: currentName || "",
       random:      randomCheck.checked,
-      sort:        sortSelect.value
+      sort:        sortSelect.value,
+      volume:      Number(volume.value)
     };
     try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch {}
   }
@@ -489,11 +960,12 @@
   }
 
   // ---------- Playback ----------
-  function playTrack(index) {
+  function startTrack(index, mode) {
     if (index < 0 || index >= viewTracks.length) return;
     currentIndex = index;
     currentName = viewTracks[index].name;
     const track = viewTracks[index];
+
     audio.src = track.url;
     nowTitle.textContent = track.name;
     nowState.textContent = "playing";
@@ -504,28 +976,117 @@
       setIcon(false);
       nowState.textContent = "press play";
     });
+
+    if (mode === "new") {
+      pushHistory(track.name);
+    } else {
+      refreshPlayedClasses();
+      updateClearBtn();
+    }
+
     updateActive();
     saveSettings();
+
+    if (mode === "new" && allPlayed()) {
+      setTimeout(() => resetHistory(), 250);
+    }
+  }
+
+  function userClickTrack(index) {
+    if (viewTracks[index] && viewTracks[index].name === currentName) {
+      if (audio.paused) audio.play().then(() => { setIcon(true); nowState.textContent = "playing"; });
+      return;
+    }
+    startTrack(index, "new");
   }
 
   function togglePlay() {
     if (viewTracks.length === 0) return;
-    if (currentIndex === -1) { playTrack(Math.floor(Math.random() * viewTracks.length)); return; }
+    if (currentIndex === -1) {
+      const idx = pickNextNew();
+      if (idx >= 0) startTrack(idx, "new");
+      return;
+    }
     if (audio.paused) audio.play().then(() => { setIcon(true); nowState.textContent = "playing"; });
     else { audio.pause(); setIcon(false); nowState.textContent = "paused"; }
   }
 
-  function getNextIndex() {
+  function pickNextNew() {
     if (viewTracks.length === 0) return -1;
-    if (randomCheck.checked) {
-      if (viewTracks.length === 1) return 0;
-      let next;
-      do { next = Math.floor(Math.random() * viewTracks.length); } while (next === currentIndex);
-      return next;
+    const played = playedSet();
+    const unplayed = [];
+    viewTracks.forEach((t, i) => {
+      if (!played.has(t.name) && t.name !== currentName) unplayed.push(i);
+    });
+
+    if (unplayed.length === 0) {
+      resetHistory();
+      const fresh = [];
+      viewTracks.forEach((t, i) => {
+        if (t.name !== currentName) fresh.push(i);
+      });
+      if (fresh.length === 0) return viewTracks.length === 1 ? 0 : -1;
+      return randomCheck.checked
+        ? fresh[Math.floor(Math.random() * fresh.length)]
+        : fresh[0];
     }
-    return (currentIndex + 1) % viewTracks.length;
+
+    if (randomCheck.checked) {
+      return unplayed[Math.floor(Math.random() * unplayed.length)];
+    }
+    for (let step = 1; step <= viewTracks.length; step++) {
+      const i = (currentIndex + step) % viewTracks.length;
+      if (unplayed.includes(i)) return i;
+    }
+    return unplayed[0];
   }
-  function nextTrack() { if (viewTracks.length) playTrack(getNextIndex()); }
+
+  function nextTrack() {
+    if (viewTracks.length === 0) return;
+    if (historyCursor < history.length - 1) {
+      const nextName = history[historyCursor + 1];
+      let idx = viewTracks.findIndex(t => t.name === nextName);
+      if (idx < 0) {
+        searchInput.value = "";
+        applySortingAndFilter();
+        idx = viewTracks.findIndex(t => t.name === nextName);
+      }
+      if (idx >= 0) {
+        historyCursor += 1;
+        startTrack(idx, "walk");
+        return;
+      }
+      historyCursor += 1;
+      if (historyCursor < history.length - 1) {
+        nextTrack();
+        return;
+      }
+    }
+    const idx = pickNextNew();
+    if (idx >= 0) startTrack(idx, "new");
+  }
+
+  function prevTrack() {
+    if (historyCursor <= 0) return;
+    let newCursor = historyCursor - 1;
+    while (newCursor >= 0) {
+      const name = history[newCursor];
+      let idx = viewTracks.findIndex(t => t.name === name);
+      if (idx < 0) {
+        searchInput.value = "";
+        applySortingAndFilter();
+        idx = viewTracks.findIndex(t => t.name === name);
+      }
+      if (idx >= 0) {
+        historyCursor = newCursor;
+        startTrack(idx, "walk");
+        return;
+      }
+      newCursor -= 1;
+    }
+    historyCursor = Math.max(0, newCursor);
+    updateClearBtn();
+  }
 
   // ---------- Clear (playlist) ----------
   async function clearAll() {
@@ -540,6 +1101,8 @@
     currentIndex = -1;
     currentName = "";
     folderName = "";
+    history = [];
+    historyCursor = -1;
     pathform.value = "";
     searchInput.value = "";
     nowTitle.textContent = "—";
@@ -576,6 +1139,8 @@
     viewTracks = [];
     currentIndex = -1;
     currentName = "";
+    history = [];
+    historyCursor = -1;
     setIcon(false);
     progress.value = "0";
     progress.disabled = true;
@@ -590,7 +1155,8 @@
     nowTitle.textContent = "—";
 
     if (viewTracks.length > 0) {
-      let idx = preferredName ? viewTracks.findIndex(t => t.name === preferredName) : -1;
+      let idx = -1;
+      if (preferredName) idx = viewTracks.findIndex(t => t.name === preferredName);
       if (idx < 0) idx = Math.floor(Math.random() * viewTracks.length);
       return idx;
     }
@@ -607,15 +1173,18 @@
 
   // ---------- Manual loading ----------
   async function loadFolder() {
+    // Auto-update check
+    checkForUpdates().catch(() => {});
+
     if (!("showDirectoryPicker" in window)) {
-      updateHint("Your browser does not support the File System Access API. Use Chrome, Edge or Opera.");
+      updateHint("API not supported. Use Chrome/Edge.");
       return;
     }
     try {
       const dirHandle = await window.showDirectoryPicker({ mode: "read" });
       await saveDirHandle(dirHandle);
       const idx = await populateFromHandle(dirHandle, null);
-      if (idx >= 0) playTrack(idx);
+      if (idx >= 0) startTrack(idx, "new");
     } catch (err) {
       if (err.name !== "AbortError") updateHint("Error: " + err.message);
     }
@@ -623,13 +1192,16 @@
 
   // ---------- Refresh ----------
   async function refreshCurrent() {
+    // Auto-update check
+    checkForUpdates().catch(() => {});
+
     const wantedName = pathform.value.trim();
     if (!wantedName) {
-      updateHint('No folder specified. Select it with "Choose folder".');
+      updateHint("No folder specified.");
       return;
     }
     if (!("showDirectoryPicker" in window)) {
-      updateHint("Your browser does not support the File System Access API. Use Chrome, Edge or Opera.");
+      updateHint("API not supported.");
       return;
     }
 
@@ -640,13 +1212,13 @@
       const ok = await ensurePermission(savedHandle, true);
       if (ok) dirHandle = savedHandle;
       else {
-        updateHint("Permission denied for folder \"" + wantedName + "\". Reopen it with \"Choose folder\".");
+        updateHint("Permission denied.");
         return;
       }
     }
 
     if (!dirHandle) {
-      updateHint("Folder \"" + wantedName + "\" is no longer stored. Reselect it to refresh.");
+      updateHint("Folder lost. Reselect.");
       try {
         dirHandle = await window.showDirectoryPicker({ mode: "read" });
       } catch (err) {
@@ -661,7 +1233,7 @@
     try {
       const idx = await populateFromHandle(dirHandle, preferred);
       if (idx >= 0 && wasPlaying) {
-        playTrack(idx);
+        startTrack(idx, "new");
       } else if (idx >= 0) {
         currentIndex = idx;
         currentName = viewTracks[idx].name;
@@ -671,7 +1243,7 @@
         saveSettings();
       }
     } catch (e) {
-      updateHint("Unable to re-read folder: " + e.message);
+      updateHint("Read error: " + e.message);
     }
   }
 
@@ -681,6 +1253,9 @@
     updateClearBtn();
     progress.disabled = true;
 
+    // Auto-update check
+    checkForUpdates().catch(() => {});
+
     const settings = loadSettings();
 
     if (settings && typeof settings.random === "boolean") {
@@ -689,6 +1264,15 @@
     if (settings && settings.sort) {
       sortSelect.value = settings.sort;
     }
+    if (settings && typeof settings.volume === "number" && isFinite(settings.volume)) {
+      volume.value = String(Math.max(0, Math.min(1, settings.volume)));
+    } else {
+      volume.value = "1";
+    }
+    lastVolume = Number(volume.value) > 0 ? Number(volume.value) : 1;
+    audio.volume = Number(volume.value);
+    updateVolumeUI();
+
     if (settings && settings.pathName) {
       pathform.value = settings.pathName;
       folderName = settings.pathName;
@@ -697,28 +1281,26 @@
     const dirHandle = await loadDirHandle();
     if (!dirHandle) {
       if (settings && settings.pathName) {
-        updateHint("Last folder: " + settings.pathName +
-          '. Press "Refresh" or "Choose folder" to reopen it.');
+        updateHint("Last folder: " + settings.pathName + ' (Click Refresh)');
       } else {
         updateHint();
       }
       return;
     }
 
-    updateHint('Restoring folder "' + dirHandle.name + '"…');
+    updateHint('Restoring…');
     const granted = await ensurePermission(dirHandle, true);
     if (!granted) {
-      updateHint("Permission for folder \"" + dirHandle.name +
-        "\" not granted. Press \"Refresh\" or \"Choose folder\" to reopen it.");
+      updateHint("Permission denied. Click Refresh.");
       return;
     }
 
     try {
       const preferred = settings && settings.currentName ? settings.currentName : null;
       const idx = await populateFromHandle(dirHandle, preferred);
-      if (idx >= 0) playTrack(idx);
+      if (idx >= 0) startTrack(idx, "new");
     } catch (e) {
-      updateHint("Unable to read folder: " + e.message);
+      updateHint("Read error: " + e.message);
     }
   }
 
@@ -726,6 +1308,7 @@
   loadBtn.addEventListener("click", loadFolder);
   refreshBtn.addEventListener("click", refreshCurrent);
   playBtn.addEventListener("click", togglePlay);
+  prevBtn.addEventListener("click", prevTrack);
   nextBtn.addEventListener("click", nextTrack);
   clearBtn.addEventListener("click", clearAll);
   randomCheck.addEventListener("change", saveSettings);
@@ -749,7 +1332,9 @@
   audio.addEventListener("pause", () => setIcon(false));
 
   document.addEventListener("keydown", e => {
-    if (e.code === "Space" && e.target === document.body) { e.preventDefault(); togglePlay(); }
+    if (e.code === "Space" && e.target.tagName !== "INPUT" && e.target.tagName !== "BUTTON") {
+      e.preventDefault(); togglePlay();
+    }
   });
 
   window.addEventListener("beforeunload", saveSettings);
