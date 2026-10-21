@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TabTape</title>
+<!-- by www.ilbak.it - https://github.com/ilbak/tabtape -->
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
 <style>
   :root {
@@ -555,64 +556,6 @@
 <script>
 (function () {
   "use strict";
-
-  // ============================================================
-  // AUTO-UPDATE FROM GITHUB
-  // ============================================================
-  const UPDATE_URL = "https://raw.githubusercontent.com/ilbak/tabtape/refs/heads/main/TabTape.html";
-  const LS_UPDATE_KEY = "tabtape.pendingUpdate";
-
-  // 1. Applica aggiornamento pendente PRIMA di tutto il resto.
-  //    Usa un Blob URL e reindirizza il browser. Questo crea un documento pulito
-  //    e non duplica il DOM come farebbe document.write.
-  const pending = localStorage.getItem(LS_UPDATE_KEY);
-  if (pending && pending.trim().length > 0) {
-    try { localStorage.removeItem(LS_UPDATE_KEY); } catch {}
-    const blob = new Blob([pending], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    window.location.replace(url);
-    // Interrompe l'esecuzione dello script corrente
-    throw new Error("REDIRECTING_TO_UPDATE");
-  }
-
-  // 2. Controllo asincrono
-  async function checkForUpdates() {
-    // Previene esecuzioni multiple contemporanee (es. click ripetuti su Refresh)
-    if (window.__tabtape_updating) return;
-    
-    let current = "";
-    try { current = document.documentElement.outerHTML; } catch { return; }
-
-    let remote = "";
-    try {
-      const res = await fetch(UPDATE_URL, { cache: "no-store" });
-      if (!res.ok) return;
-      remote = await res.text();
-    } catch {
-      return; // Silenzioso per offline, CORS, file://
-    }
-
-    if (!remote || remote.trim().length === 0) return;
-
-    const norm = s => s.replace(/\r\n/g, "\n").trim();
-    const a = norm(remote);
-    const b = norm(current);
-
-    if (a === b) return;
-
-    // Sincronizza il testo in localStorage. Alla prossima ricarica verrà
-    // applicato tramite Blob URL dall'inizio dello script.
-    try { 
-      localStorage.setItem(LS_UPDATE_KEY, remote);
-      window.__tabtape_updating = true;
-      window.location.reload();
-    } catch { return; }
-  }
-
-  // ============================================================
-  // APP TABTAPE 2.8
-  // ============================================================
-
   const AUDIO_EXTS = [".mp3", ".m4a", ".opus", ".ogg", ".oga", ".wav"];
 
   const LS_KEY      = "musicPlayer.settings.v1";
@@ -1173,9 +1116,6 @@
 
   // ---------- Manual loading ----------
   async function loadFolder() {
-    // Auto-update check
-    checkForUpdates().catch(() => {});
-
     if (!("showDirectoryPicker" in window)) {
       updateHint("API not supported. Use Chrome/Edge.");
       return;
@@ -1192,9 +1132,6 @@
 
   // ---------- Refresh ----------
   async function refreshCurrent() {
-    // Auto-update check
-    checkForUpdates().catch(() => {});
-
     const wantedName = pathform.value.trim();
     if (!wantedName) {
       updateHint("No folder specified.");
@@ -1252,9 +1189,6 @@
     setIcon(false);
     updateClearBtn();
     progress.disabled = true;
-
-    // Auto-update check
-    checkForUpdates().catch(() => {});
 
     const settings = loadSettings();
 
