@@ -6,6 +6,8 @@
 
 **TabTape** is a minimal, local-first web app for playing audio files directly from a folder on your computer — no uploads, no server, no dependencies. Just open the HTML file in your browser, pick a folder, and listen. In a a single self-contained HTML file.
 
+_"I created this web app as a tribute to "mixtapes"—the cassette tapes we used to record at home to listen to and share our favorite songs. We are losing ownership of art and content, as these are increasingly entrusted to various platforms and services; with this little app, we make it easier to enjoy music stored on a physical disk, just like in the good old days."_ - Roberto "The BaK" Cananzi
+
 ## Features
 
 - 📁 **Folder-based playback** — choose a local folder and TabTape loads all supported audio files automatically.
