@@ -300,7 +300,7 @@
   input[type=range] {
     -webkit-appearance: none;
     flex: 1;
-    height: 8px; /* Bigger track */
+    height: 8px;
     background: #d0c5ae;
     border-radius: 4px;
     outline: none;
@@ -309,7 +309,7 @@
   }
   input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 24px; height: 24px; /* Bigger thumb for touch */
+    width: 24px; height: 24px;
     border-radius: 50%;
     background: #333;
     border: 2px solid #111;
@@ -460,7 +460,8 @@
     <!-- Content Area -->
     <div class="content-area">
       
-      <input type="file" id="folderInput" webkitdirectory directory multiple class="sr-only">
+      <!-- Input file senza webkitdirectory per evitare crash di memoria su Android -->
+      <input type="file" id="folderInput" accept="audio/*" multiple class="sr-only">
 
       <!-- Toolbar -->
       <div class="toolbar">
@@ -563,10 +564,14 @@
   const IDB_STORE   = "handles";
   const IDB_KEY_DIR = "lastDir";
 
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const isDesktopFolderSupported = ("showDirectoryPicker" in window) && !isAndroid;
+
   const pathform      = document.getElementById("pathform");
   const hint          = document.getElementById("hint");
   const loadBtn       = document.getElementById("loadBtn");
   const refreshBtn    = document.getElementById("refreshBtn");
+  const folderInput   = document.getElementById("folderInput");
   const playlistEl    = document.getElementById("playlist");
   const searchInput   = document.getElementById("searchInput");
   const searchClearBtn= document.getElementById("searchClearBtn");
@@ -597,6 +602,7 @@
   let lastVolume = 1;
   let history = [];
   let historyCursor = -1;
+  let currentActiveUrl = null;
 
   // ---------- Utilities ----------
   const isAudio = name => AUDIO_EXTS.some(ext => name.toLowerCase().endsWith(ext));
@@ -909,7 +915,20 @@
     currentName = viewTracks[index].name;
     const track = viewTracks[index];
 
-    audio.src = track.url;
+    // Rilascia la memoria del brano precedente per evitare accumuli di ram
+    if (currentActiveUrl) {
+      URL.revokeObjectURL(currentActiveUrl);
+      currentActiveUrl = null;
+    }
+
+    // Ottieni URL On-Demand (Lazy Creation per non saturare la memoria RAM su mobile)
+    let srcUrl = track.url;
+    if (!srcUrl && track.file) {
+      currentActiveUrl = URL.createObjectURL(track.file);
+      srcUrl = currentActiveUrl;
+    }
+
+    audio.src = srcUrl;
     nowTitle.textContent = track.name;
     nowState.textContent = "playing";
     progress.value = "0";
@@ -1037,7 +1056,11 @@
     audio.removeAttribute("src");
     audio.load();
     setIcon(false);
-    Array.from(trackMap.values()).forEach(t => URL.revokeObjectURL(t.url));
+    if (currentActiveUrl) {
+      URL.revokeObjectURL(currentActiveUrl);
+      currentActiveUrl = null;
+    }
+    Array.from(trackMap.values()).forEach(t => { if (t.url) URL.revokeObjectURL(t.url); });
     trackMap = new Map();
     tracks = [];
     viewTracks = [];
@@ -1072,11 +1095,15 @@
     return files;
   }
 
-  async function populateFromFiles(files, preferredName) {
+  async function populateFromFiles(files, preferredName, isLazy = false) {
     audio.pause();
     audio.removeAttribute("src");
     audio.load();
-    Array.from(trackMap.values()).forEach(t => URL.revokeObjectURL(t.url));
+    if (currentActiveUrl) {
+      URL.revokeObjectURL(currentActiveUrl);
+      currentActiveUrl = null;
+    }
+    Array.from(trackMap.values()).forEach(t => { if (t.url) URL.revokeObjectURL(t.url); });
     trackMap = new Map();
     tracks = [];
     viewTracks = [];
@@ -1090,7 +1117,12 @@
     updateTimeUI(0, 0);
 
     for (const { name, file } of files) {
-      trackMap.set(name, { name, url: URL.createObjectURL(file) });
+      if (isLazy) {
+        // Salviamo il file sorgente anziché generare subito l'Object URL
+        trackMap.set(name, { name, file: file, url: null });
+      } else {
+        trackMap.set(name, { name, url: URL.createObjectURL(file) });
+      }
     }
 
     applySortingAndFilter();
@@ -1111,13 +1143,13 @@
     folderName = dirHandle.name;
     pathform.value = dirHandle.name;
     const files = await readAudioFilesFromDir(dirHandle);
-    return populateFromFiles(files, preferredName);
+    return populateFromFiles(files, preferredName, false);
   }
 
   // ---------- Manual loading ----------
   async function loadFolder() {
-    if (!("showDirectoryPicker" in window)) {
-      updateHint("API not supported. Use Chrome/Edge.");
+    if (!isDesktopFolderSupported) {
+      folderInput.click();
       return;
     }
     try {
@@ -1137,8 +1169,8 @@
       updateHint("No folder specified.");
       return;
     }
-    if (!("showDirectoryPicker" in window)) {
-      updateHint("API not supported.");
+    if (!isDesktopFolderSupported) {
+      updateHint("Click Load to select files.");
       return;
     }
 
@@ -1212,6 +1244,11 @@
       folderName = settings.pathName;
     }
 
+    if (!isDesktopFolderSupported) {
+      updateHint();
+      return;
+    }
+
     const dirHandle = await loadDirHandle();
     if (!dirHandle) {
       if (settings && settings.pathName) {
@@ -1241,6 +1278,24 @@
   // ---------- Events ----------
   loadBtn.addEventListener("click", loadFolder);
   refreshBtn.addEventListener("click", refreshCurrent);
+
+  folderInput.addEventListener("change", async (e) => {
+    const rawFiles = Array.from(e.target.files);
+    const files = rawFiles
+      .map(file => ({ name: file.name, file }))
+      .filter(item => isAudio(item.name));
+
+    if (files.length > 0) {
+      folderName = "Loaded Tracks";
+      pathform.value = `${files.length} tracks loaded`;
+      // Abilitiamo il caricamento pigro (isLazy = true) per la RAM su mobile
+      const idx = await populateFromFiles(files, null, true);
+      if (idx >= 0) startTrack(idx, "new");
+    } else {
+      updateHint("No valid audio files found.");
+    }
+  });
+
   playBtn.addEventListener("click", togglePlay);
   prevBtn.addEventListener("click", prevTrack);
   nextBtn.addEventListener("click", nextTrack);
